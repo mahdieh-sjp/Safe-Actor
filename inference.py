@@ -15,7 +15,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 def main(llm, model, temperature, top_p):
     initialize_seeds()
     model = model.split("/")[-1]
-    sampling_params = SamplingParams(max_tokens=8192, temperature=temperature)
+    sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
     DATA_DIR = "../golden-dataset/data/"
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
 
@@ -91,4 +91,4 @@ if __name__ == "__main__":
         #   download_dir=os.environ["HF_MODELS"],
         gpu_memory_utilization=0.95,
     )
-    main(llm, args.model, args.datasets, args.temperature, args.top_p, args.conversation)
+    main(llm, args.model, args.temperature, args.top_p)
