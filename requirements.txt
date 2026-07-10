@@ -1,15 +1,15 @@
-accelerate
-bitsandbytes
+#accelerate
+#bitsandbytes
 datasets
 google-genai
-liger-kernel
-llama-cpp-python
+#liger-kernel
+#llama-cpp-python
 pandas
 peft
 pydantic
-torch
+#torch
 transformers
-trl==0.11.0
-vllm
-unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
-xformers<0.0.27
+trl
+#vllm
+#unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
+#xformers<0.0.27
