@@ -38,19 +38,20 @@ def main(llm, model, temperature, top_p):
             continue
 
         persona_instruction = f"You are exactly this character: {persona_name}. {persona_desc}"
-        messages = [[
+        prompts = [[
                     {"role": "system", "content": persona_instruction},
                     {"role": "user", "content": q}]
                     for q in test_df[test_df['persona'] == persona_name]["prompt"]
                 ]
-        prompts = [llm.get_chat_template(messages, chat_template_kwargs={"enable_thinking": False}) for m in messages]
         print(
             f"Generating responses for role {persona_name} from model {model}"
         )
         responses = []
         print(f"Example prompt: {prompts[0]}")
-        llm.generate(prompts[0], sampling_params=sampling_params)
-        outputs = llm.generate(prompts, sampling_params=sampling_params)
+        llm.chat(prompts[0], sampling_params=sampling_params,
+                 chat_template_kwargs={"enable_thinking": False})
+        outputs = llm.chat(prompts[0], sampling_params=sampling_params,
+                 chat_template_kwargs={"enable_thinking": False})
         for output in outputs:
             generated_text = output.outputs[0].text.rstrip(" _\n")
             responses.append(generated_text)
