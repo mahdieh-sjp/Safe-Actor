@@ -16,7 +16,7 @@ def main(llm, model, temperature, top_p):
     initialize_seeds()
     model = model.split("/")[-1]
     sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
-    DATA_DIR = "../golden-dataset/data/"
+    DATA_DIR = "./golden-dataset/data/"
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
 
     df_list = [pd.read_csv(f) for f in files if "empty" not in f]
