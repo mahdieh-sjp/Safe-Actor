@@ -41,7 +41,7 @@ def main(llm, model, temperature, top_p):
         messages = [[
                     {"role": "system", "content": persona_instruction},
                     {"role": "user", "content": q}]
-                    for q in test_df[test_df['persona'] == persona_name]["query"]
+                    for q in test_df[test_df['persona'] == persona_name]["prompt"]
                 ]
         prompts = [llm.get_chat_template(messages, chat_template_kwargs={"enable_thinking": False}) for m in messages]
         print(
