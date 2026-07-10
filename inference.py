@@ -22,7 +22,7 @@ def main(llm, model, temperature, top_p):
     df_list = [pd.read_csv(f) for f in files if "empty" not in f]
     merged_df = pd.concat(df_list, axis=0, ignore_index=True)
     test_df = merged_df[merged_df["split"] == "test"]
-    with open('../golden-dataset/personas_desc.json', 'r') as f:
+    with open('./golden-dataset/personas_desc.json', 'r') as f:
         personas = json.load(f)
     print(f"\nCharacterful Response Generation for {model}")
         
