@@ -50,7 +50,7 @@ def main(llm, model, temperature, top_p):
         print(f"Example prompt: {prompts[0]}")
         llm.chat(prompts[0], sampling_params=sampling_params,
                  chat_template_kwargs={"enable_thinking": False})
-        outputs = llm.chat(prompts[0], sampling_params=sampling_params,
+        outputs = llm.chat(prompts, sampling_params=sampling_params,
                  chat_template_kwargs={"enable_thinking": False})
         for output in outputs:
             generated_text = output.outputs[0].text.rstrip(" _\n")
