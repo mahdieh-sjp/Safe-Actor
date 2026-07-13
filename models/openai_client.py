@@ -62,5 +62,5 @@ class OpenAIBatchClient:
         """
         resp = self.__call_with_retry(input, persona)
         print(resp)
-        if "Error code: 400" in resp: return "Null"
+        if "Error code: 400" in str(resp): return "Null"
         return resp.output_text if resp else None
