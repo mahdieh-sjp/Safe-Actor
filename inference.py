@@ -1,8 +1,8 @@
 import argparse
 from pathlib import Path
 from utils.seeds import initialize_seeds
-from vllm.sampling_params import SamplingParams
 from google import genai
+from models.openai_client import OpenAIBatchClient
 import json
 import glob
 import pandas as pd
@@ -12,10 +12,9 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-def main(llm, model, temperature, top_p):
+def main(llm, model, client, temperature, top_p):
     initialize_seeds()
     model = model.split("/")[-1]
-    sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
     DATA_DIR = "./golden-dataset/data/"
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
 
@@ -36,25 +35,31 @@ def main(llm, model, temperature, top_p):
                 f"Skipping generations from model {model} for role {persona_name}: already computed."
             )
             continue
-
         persona_instruction = f"You are exactly this character: {persona_name}. {persona_desc}"
-        prompts = [[
-                    {"role": "system", "content": persona_instruction},
-                    {"role": "user", "content": q}]
-                    for q in test_df[test_df['persona'] == persona_name]["prompt"]
-                ]
-        print(
-            f"Generating responses for role {persona_name} from model {model}"
-        )
         responses = []
-        print(f"Example prompt: {prompts[0]}")
-        llm.chat(prompts[0], sampling_params=sampling_params,
-                 chat_template_kwargs={"enable_thinking": False})
-        outputs = llm.chat(prompts, sampling_params=sampling_params,
-                 chat_template_kwargs={"enable_thinking": False})
-        for output in outputs:
-            generated_text = output.outputs[0].text.rstrip(" _\n")
-            responses.append(generated_text)
+        print(
+                f"Generating responses for role {persona_name} from model {model}"
+            )
+        if client is None:
+            sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
+            prompts = [[
+                        {"role": "system", "content": persona_instruction},
+                        {"role": "user", "content": q}]
+                        for q in test_df[test_df['persona'] == persona_name]["prompt"]
+                    ]
+            print(f"Example prompt: {prompts[0]}")
+            llm.chat(prompts[0], sampling_params=sampling_params,
+                    chat_template_kwargs={"enable_thinking": False})
+            outputs = llm.chat(prompts, sampling_params=sampling_params,
+                    chat_template_kwargs={"enable_thinking": False})
+            for output in outputs:
+                generated_text = output.outputs[0].text.rstrip(" _\n")
+                responses.append(generated_text)
+        elif client == "openai":
+            for q in test_df[test_df['persona'] == persona_name]["prompt"]:
+                response = llm.run_prompt(q, persona_instruction).rstrip(" _\n")
+                responses.append(response)
+
         result_path.parent.mkdir(exist_ok=True, parents=True)
         json.dump(responses, open(result_path, "w"))
 
@@ -65,6 +70,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("model", help="The model model to be prompted.", type=str)
     parser.add_argument("--gpus", help="Number of gpus", type=int, default=1)
+    parser.add_argument("--client", help="If using openai api", type=str, default=None, choices=["openai"])
     parser.add_argument(
         "--temperature",
         help="Temperature for probabiliy scaling.",
@@ -81,15 +87,19 @@ if __name__ == "__main__":
         "--dtype", help="dtype to load the model", type=str, default="auto"
     )
     args = parser.parse_args()
-    import vllm
+    if args.client is None:
+        import vllm
+        from vllm.sampling_params import SamplingParams
 
-    llm = vllm.LLM(
-        model=args.model,
-        enable_prefix_caching=True,
-        dtype=args.dtype,
-        trust_remote_code=True,
-        tensor_parallel_size=args.gpus,
-        #   download_dir=os.environ["HF_MODELS"],
-        gpu_memory_utilization=0.95,
-    )
-    main(llm, args.model, args.temperature, args.top_p)
+        llm = vllm.LLM(
+            model=args.model,
+            enable_prefix_caching=True,
+            dtype=args.dtype,
+            trust_remote_code=True,
+            tensor_parallel_size=args.gpus,
+            #   download_dir=os.environ["HF_MODELS"],
+            gpu_memory_utilization=0.95,
+        )
+    elif args.client == "openai":
+        llm = OpenAIBatchClient(model_name=args.model)
+    main(llm, args.model, args.client, args.temperature, args.top_p)
