@@ -17,6 +17,7 @@ def main(llm, model, client, temperature, top_p):
     model = model.split("/")[-1]
     DATA_DIR = "./golden-dataset/data/"
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
+    files = sorted(files)
 
     df_list = [pd.read_csv(f) for f in files if "empty" not in f]
     merged_df = pd.concat(df_list, axis=0, ignore_index=True)
