@@ -93,3 +93,6 @@ def get_prompt(persona_name, persona_desc, prompt, response_text):
         USER PROMPT: {prompt}
         AI RESPONSE: {response_text}"""
     return judge_instruction
+
+def get_system_prompt(persona, persona_desc):
+    return f"You are exactly this character: {persona}. {persona_desc}"
