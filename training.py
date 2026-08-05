@@ -146,7 +146,6 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
         peft_config=peft_config,
         train_dataset=dpo_dataset,
         args=dpo_config,
-        processing_class=tokenizer
     )
     trainer.model.print_trainable_parameters()
 
