@@ -138,7 +138,7 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
     dpo_model = trainer.model.merge_and_unload()
 
     # 2. Free SFT trainer state & clear VRAM cache
-    del trainer, base_model
+    del trainer
     torch.cuda.empty_cache()
 
     trainer =  DPOTrainer(

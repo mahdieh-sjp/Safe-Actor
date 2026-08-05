@@ -1,12 +1,16 @@
 import argparse
 from pathlib import Path
+
+from peft import PeftModel
 from utils.seeds import initialize_seeds
 from google import genai
 from models.openai_client import OpenAIBatchClient
+from transformers import AutoModelForCausalLM
 import json
 import glob
 import pandas as pd
 import os
+import torch
 
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -70,6 +74,7 @@ if __name__ == "__main__":
         description="Run inference for model {model}."
     )
     parser.add_argument("model", help="The model model to be prompted.", type=str)
+    parser.add_argument("--base_model", help="The base model that was adapted.", type=str, default=None)
     parser.add_argument("--gpus", help="Number of gpus", type=int, default=1)
     parser.add_argument("--client", help="If using openai api", type=str, default=None, choices=["openai"])
     parser.add_argument(
@@ -92,14 +97,43 @@ if __name__ == "__main__":
         import vllm
         from vllm.sampling_params import SamplingParams
 
+        if "SFT" in args.model:
+            base_model = args.base_model
+            model  = AutoModelForCausalLM.from_pretrained(
+                args.base_model,
+                dtype=torch.bfloat16,
+            )
+            model = PeftModel.from_pretrained(
+                        model,
+                        f"{args.model.replace('+DPO', '')}/final_adapter",
+                    )
+            model = model.merge_and_unload()
+            if "DPO" in args.model:
+                model = PeftModel.from_pretrained(
+                            model,
+                            f"{args.model}/final_adapter",
+                        )
+                model = model.merge_and_unload()
+            model.save_pretrained(
+                "/tmp/merged_model",
+                safe_serialization=True,
+            )
+            model = "/tmp/merged_model"
+
+        else:
+            model = args.model
+            base_model = model
+
+
         llm = vllm.LLM(
-            model=args.model,
+            model=model,
             enable_prefix_caching=True,
             dtype=args.dtype,
             trust_remote_code=True,
             tensor_parallel_size=args.gpus,
             #   download_dir=os.environ["HF_MODELS"],
             gpu_memory_utilization=0.95,
+            tokenizer=base_model
         )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
