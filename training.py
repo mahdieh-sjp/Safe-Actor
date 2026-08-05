@@ -118,16 +118,11 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
         save_strategy="epoch",
     )
 
-    base_model = AutoModelForCausalLM.from_pretrained(model,  dtype=torch.bfloat16,
-                                                      trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained(model, trust_remote_code=True)
-
     trainer = SFTTrainer(
-        model=base_model,
+        model=model,
         peft_config=peft_config,
         train_dataset=sft_dataset,
         args=sft_config,
-        processing_class=tokenizer
     )
 
     trainer.model.print_trainable_parameters()
