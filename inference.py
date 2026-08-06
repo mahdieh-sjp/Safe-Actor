@@ -119,51 +119,59 @@ if __name__ == "__main__":
                         )
                 model = model.merge_and_unload()
             model.generation_config.top_p = None
-            model.save_pretrained(
-                "/tmp/merged_model",
-                safe_serialization=True,
-            )
-            if "gemma" in args.model:
-                processor = AutoProcessor.from_pretrained(
-                    args.base_model,
-                    trust_remote_code=True,
-                )
-                processor.save_pretrained(
-                    "/tmp/merged_model"
-                )
-            if "nemotron" in args.model.lower():
-                snapshot_download(
-                    repo_id=args.base_model,
-                    local_dir="/tmp/merged_model",
-                    allow_patterns=["*.py"],
-                )
 
-                config_path = "/tmp/merged_model/config.json"
-                if os.path.exists(config_path):
-                    with open(config_path, "r") as f:
-                        config_data = json.load(f)
-                    if "layers_block_type" in config_data:
-                        del config_data["layers_block_type"]
-                        with open(config_path, "w") as f:
-                            json.dump(config_data, f, indent=2)
-                    model = "/tmp/merged_model"
+            if args.client == None:
+                model.save_pretrained(
+                    "/tmp/merged_model",
+                    safe_serialization=True,
+                )
+                if "gemma" in args.model:
+                    processor = AutoProcessor.from_pretrained(
+                        args.base_model,
+                        trust_remote_code=True,
+                    )
+                    processor.save_pretrained(
+                        "/tmp/merged_model"
+                    )
+                if "nemotron" in args.model.lower():
+                    snapshot_download(
+                        repo_id=args.base_model,
+                        local_dir="/tmp/merged_model",
+                        allow_patterns=["*.py"],
+                    )
 
-                modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
-                if os.path.exists(modeling_path):
-                    with open(modeling_path, "r") as f:
-                        code = f.read()
-                    if "or cache_position[-1] >=" in code:
-                        code = code.replace(
-                            "or cache_position[-1] >=", 
-                            "or (cache_position is not None and cache_position[-1] >="
-                        )
-                        with open(modeling_path, "w") as f:
-                            f.write(code)
+                    config_path = "/tmp/merged_model/config.json"
+                    if os.path.exists(config_path):
+                        with open(config_path, "r") as f:
+                            config_data = json.load(f)
+                        if "layers_block_type" in config_data:
+                            del config_data["layers_block_type"]
+                            with open(config_path, "w") as f:
+                                json.dump(config_data, f, indent=2)
+                        model = "/tmp/merged_model"
+
+                    modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
+                    if os.path.exists(modeling_path):
+                        with open(modeling_path, "r") as f:
+                            code = f.read()
+                        if "or cache_position[-1] >=" in code:
+                            code = code.replace(
+                                "or cache_position[-1] >=", 
+                                "or (cache_position is not None and cache_position[-1] >="
+                            )
+                            with open(modeling_path, "w") as f:
+                                f.write(code)
 
         else:
             model = args.model
             base_model = model
         if args.client == "hf":
+            print(f"Using transformers inference engine for {base_model} (in-memory model, no disk round trip)")
+            if isinstance(model, str):
+                llm = HFChatClient(model_path=model, tokenizer_path=base_model, dtype=args.dtype, trust_remote_code=True)
+            else:
+                llm = HFChatClient(model=model, tokenizer_path=base_model, trust_remote_code=True)
+
             print(f"Using transformers inference engine for {base_model} ")
             llm = HFChatClient(
                 model_path=model,
