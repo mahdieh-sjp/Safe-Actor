@@ -171,14 +171,6 @@ if __name__ == "__main__":
                 llm = HFChatClient(model_path=model, tokenizer_path=base_model, dtype=args.dtype, trust_remote_code=True)
             else:
                 llm = HFChatClient(model=model, tokenizer_path=base_model, trust_remote_code=True)
-
-            print(f"Using transformers inference engine for {base_model} ")
-            llm = HFChatClient(
-                model_path=model,
-                tokenizer_path=base_model,
-                dtype=args.dtype,
-                trust_remote_code=True,
-            )
         else:
             if ("Qwen" in args.model or "nemotron" in args.model.lower()) and "SFT" in args.model:
                 import vllm
