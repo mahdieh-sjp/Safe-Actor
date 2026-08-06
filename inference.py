@@ -17,7 +17,7 @@ import torch
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-def main(llm, model, client, temperature, top_p):
+def main(llm, model, client, temperature):
     initialize_seeds()
     model = model.split("/")[-1]
     DATA_DIR = "./golden-dataset/data/"
@@ -48,9 +48,9 @@ def main(llm, model, client, temperature, top_p):
             )
         if client is None or client == "hf":
             if client is None:
-                sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
+                sampling_params = SamplingParams(max_tokens=8192, temperature=temperature)
             else:
-                sampling_params = {"max_tokens": 8192, "temperature": temperature, "top_p": top_p}
+                sampling_params = {"max_tokens": 8192, "temperature": temperature}
             prompts = [[
                         {"role": "system", "content": persona_instruction},
                         {"role": "user", "content": q}]
@@ -86,12 +86,6 @@ if __name__ == "__main__":
         help="Temperature for probabiliy scaling.",
         type=float,
         default=0.0,
-    )
-    parser.add_argument(
-        "--top_p",
-        help="Top-p proability of tokens for nucleus sampling",
-        type=float,
-        default=1.0,
     )
     parser.add_argument(
         "--dtype", help="dtype to load the model", type=str, default="auto"
@@ -142,7 +136,7 @@ if __name__ == "__main__":
                 trust_remote_code=True,
             )
         else:
-            if "Qwen" in args.model and "STF" in args.model:
+            if "Qwen" in args.model and "SFT" in args.model:
                 import vllm
                 from vllm.sampling_params import SamplingParams
 
@@ -173,4 +167,4 @@ if __name__ == "__main__":
                     )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
-    main(llm, args.model, args.client, args.temperature, args.top_p)
+    main(llm, args.model, args.client, args.temperature)
