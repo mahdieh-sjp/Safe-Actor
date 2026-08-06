@@ -132,17 +132,29 @@ if __name__ == "__main__":
             model = args.model
             base_model = model
 
-
-        llm = vllm.LLM(
-            model=model,
-            enable_prefix_caching=True,
-            dtype=args.dtype,
-            trust_remote_code=True,
-            tensor_parallel_size=args.gpus,
-            #   download_dir=os.environ["HF_MODELS"],
-            gpu_memory_utilization=0.95,
-            tokenizer=base_model
-        )
+        if "Qwen" in args.model and "STF" in args.model:
+            llm = vllm.LLM(
+                model=model,
+                enable_prefix_caching=True,
+                dtype=args.dtype,
+                trust_remote_code=True,
+                tensor_parallel_size=args.gpus,
+                model_impl="transformers"
+                #   download_dir=os.environ["HF_MODELS"],
+                gpu_memory_utilization=0.95,
+                tokenizer=base_model
+            )
+        else:
+            llm = vllm.LLM(
+                    model=model,
+                    enable_prefix_caching=True,
+                    dtype=args.dtype,
+                    trust_remote_code=True,
+                    tensor_parallel_size=args.gpus,
+                    #   download_dir=os.environ["HF_MODELS"],
+                    gpu_memory_utilization=0.95,
+                    tokenizer=base_model
+                )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
     main(llm, args.model, args.client, args.temperature, args.top_p)
