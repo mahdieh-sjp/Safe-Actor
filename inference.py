@@ -1,17 +1,21 @@
+import sys
+import os
+
+# Ensure child spawned processes can find local modules in the project root
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
 import argparse
 import gc
 from pathlib import Path
 from huggingface_hub import snapshot_download
 from peft import PeftModel
 from utils.seeds import initialize_seeds
-from google import genai
 from models.openai_client import OpenAIBatchClient
 from models.hf_client import HFChatClient
 from transformers import AutoModelForCausalLM, AutoProcessor
 import json
 import glob
 import pandas as pd
-import os
 import torch
 
 
