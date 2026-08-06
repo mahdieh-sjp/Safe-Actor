@@ -104,6 +104,7 @@ if __name__ == "__main__":
             base_model = args.base_model
             model  = AutoModelForCausalLM.from_pretrained(
                 args.base_model,
+                trust_remote_code=True,
                 dtype=torch.bfloat16,
             )
             model = PeftModel.from_pretrained(
@@ -146,6 +147,18 @@ if __name__ == "__main__":
                         with open(config_path, "w") as f:
                             json.dump(config_data, f, indent=2)
                     model = "/tmp/merged_model"
+
+                modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
+                if os.path.exists(modeling_path):
+                    with open(modeling_path, "r") as f:
+                        code = f.read()
+                    if "or cache_position[-1] >=" in code:
+                        code = code.replace(
+                            "or cache_position[-1] >=", 
+                            "or (cache_position is not None and cache_position[-1] >="
+                        )
+                        with open(modeling_path, "w") as f:
+                            f.write(code)
 
         else:
             model = args.model
