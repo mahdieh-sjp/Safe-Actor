@@ -2,7 +2,6 @@
 import os
 import torch
 from datasets import load_dataset
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.trainer_utils import get_last_checkpoint
 from peft import LoraConfig, PeftModel
 import argparse

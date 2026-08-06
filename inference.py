@@ -5,7 +5,7 @@ from peft import PeftModel
 from utils.seeds import initialize_seeds
 from google import genai
 from models.openai_client import OpenAIBatchClient
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoProcessor
 import json
 import glob
 import pandas as pd
@@ -118,6 +118,14 @@ if __name__ == "__main__":
                 "/tmp/merged_model",
                 safe_serialization=True,
             )
+            if "gemma" in args.model:
+                processor = AutoProcessor.from_pretrained(
+                    args.base_model,
+                    trust_remote_code=True,
+                )
+                processor.save_pretrained(
+                    "/tmp/merged_model"
+                )
             model = "/tmp/merged_model"
 
         else:
