@@ -5,6 +5,7 @@ from peft import PeftModel
 from utils.seeds import initialize_seeds
 from google import genai
 from models.openai_client import OpenAIBatchClient
+from models.hf_client import HFChatClient
 from transformers import AutoModelForCausalLM, AutoProcessor
 import json
 import glob
@@ -45,8 +46,11 @@ def main(llm, model, client, temperature, top_p):
         print(
                 f"Generating responses for role {persona_name} from model {model}"
             )
-        if client is None:
-            sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
+        if client is None or client == "hf":
+            if client is None:
+                sampling_params = SamplingParams(max_tokens=8192, temperature=temperature, top_p=top_p)
+            else:
+                sampling_params = {"max_tokens": 8192, "temperature": temperature, "top_p": top_p}
             prompts = [[
                         {"role": "system", "content": persona_instruction},
                         {"role": "user", "content": q}]
@@ -76,7 +80,7 @@ if __name__ == "__main__":
     parser.add_argument("model", help="The model model to be prompted.", type=str)
     parser.add_argument("--base_model", help="The base model that was adapted.", type=str, default=None)
     parser.add_argument("--gpus", help="Number of gpus", type=int, default=1)
-    parser.add_argument("--client", help="If using openai api", type=str, default=None, choices=["openai"])
+    parser.add_argument("--client", help="If using an api", type=str, default=None, choices=["openai", "hf"])
     parser.add_argument(
         "--temperature",
         help="Temperature for probabiliy scaling.",
@@ -93,9 +97,7 @@ if __name__ == "__main__":
         "--dtype", help="dtype to load the model", type=str, default="auto"
     )
     args = parser.parse_args()
-    if args.client is None:
-        import vllm
-        from vllm.sampling_params import SamplingParams
+    if args.client is None or args.client == "hf":
 
         if "SFT" in args.model:
             base_model = args.base_model
@@ -131,30 +133,44 @@ if __name__ == "__main__":
         else:
             model = args.model
             base_model = model
-
-        if "Qwen" in args.model and "STF" in args.model:
-            llm = vllm.LLM(
-                model=model,
-                enable_prefix_caching=True,
+        if args.client == "hf":
+            print(f"Using transformers inference engine for {base_model} ")
+            llm = HFChatClient(
+                model_path=model,
+                tokenizer_path=base_model,
                 dtype=args.dtype,
                 trust_remote_code=True,
-                tensor_parallel_size=args.gpus,
-                model_impl="transformers",
-                #   download_dir=os.environ["HF_MODELS"],
-                gpu_memory_utilization=0.95,
-                tokenizer=base_model
             )
         else:
-            llm = vllm.LLM(
+            if "Qwen" in args.model and "STF" in args.model:
+                import vllm
+                from vllm.sampling_params import SamplingParams
+
+                llm = vllm.LLM(
                     model=model,
                     enable_prefix_caching=True,
                     dtype=args.dtype,
                     trust_remote_code=True,
                     tensor_parallel_size=args.gpus,
+                    model_impl="transformers",
                     #   download_dir=os.environ["HF_MODELS"],
                     gpu_memory_utilization=0.95,
                     tokenizer=base_model
                 )
+            else:
+                import vllm
+                from vllm.sampling_params import SamplingParams
+
+                llm = vllm.LLM(
+                        model=model,
+                        enable_prefix_caching=True,
+                        dtype=args.dtype,
+                        trust_remote_code=True,
+                        tensor_parallel_size=args.gpus,
+                        #   download_dir=os.environ["HF_MODELS"],
+                        gpu_memory_utilization=0.95,
+                        tokenizer=base_model
+                    )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
     main(llm, args.model, args.client, args.temperature, args.top_p)
