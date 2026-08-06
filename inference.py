@@ -159,7 +159,7 @@ if __name__ == "__main__":
                 trust_remote_code=True,
             )
         else:
-            if "Qwen" in args.model and "SFT" in args.model:
+            if ("Qwen" in args.model or "nemotron" in args.model.lower()) and "SFT" in args.model:
                 import vllm
                 from vllm.sampling_params import SamplingParams
 
