@@ -139,7 +139,7 @@ if __name__ == "__main__":
                 dtype=args.dtype,
                 trust_remote_code=True,
                 tensor_parallel_size=args.gpus,
-                model_impl="transformers"
+                model_impl="transformers",
                 #   download_dir=os.environ["HF_MODELS"],
                 gpu_memory_utilization=0.95,
                 tokenizer=base_model
