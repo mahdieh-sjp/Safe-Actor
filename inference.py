@@ -1,4 +1,5 @@
 import argparse
+import gc
 from pathlib import Path
 from huggingface_hub import snapshot_download
 from peft import PeftModel
@@ -129,7 +130,16 @@ if __name__ == "__main__":
                     local_dir="/tmp/merged_model",
                     allow_patterns=["*.py"],
                 )
-            model = "/tmp/merged_model"
+
+                config_path = "/tmp/merged_model/config.json"
+                if os.path.exists(config_path):
+                    with open(config_path, "r") as f:
+                        config_data = json.load(f)
+                    if "layers_block_type" in config_data:
+                        del config_data["layers_block_type"]
+                        with open(config_path, "w") as f:
+                            json.dump(config_data, f, indent=2)
+                    model = "/tmp/merged_model"
 
         else:
             model = args.model
@@ -175,3 +185,13 @@ if __name__ == "__main__":
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
     main(llm, args.model, args.client, args.temperature)
+
+    if "llm" in locals():
+        del llm
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    print("Inference completed. Terminating process.")
+    # Use os._exit(0) to bypass blocked vLLM process joins
+    os._exit(0)
