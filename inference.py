@@ -110,6 +110,7 @@ if __name__ == "__main__":
                             f"{args.model}/final_adapter",
                         )
                 model = model.merge_and_unload()
+            model.generation_config.top_p = None
             model.save_pretrained(
                 "/tmp/merged_model",
                 safe_serialization=True,
