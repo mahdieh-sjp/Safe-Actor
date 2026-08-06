@@ -101,35 +101,26 @@ if __name__ == "__main__":
     if args.client is None or args.client == "hf":
 
         if "SFT" in args.model:
-            if "nemotron" in args.model.lower():
-                model = "models/NVIDIA-Nemotron-3-Nano-4B-BF16-SFT"
-                base_model = model
-            else:
-                base_model = args.base_model
-                model  = AutoModelForCausalLM.from_pretrained(
-                    args.base_model,
-                    trust_remote_code=True,
-                    dtype=torch.bfloat16,
-                )
+            base_model = args.base_model
+            model  = AutoModelForCausalLM.from_pretrained(
+                args.base_model,
+                trust_remote_code=True,
+                dtype=torch.bfloat16,
+            )
+            model = PeftModel.from_pretrained(
+                        model,
+                        f"{args.model.replace('+DPO', '')}/final_adapter",
+                    )
+            model = model.merge_and_unload()
+            if "DPO" in args.model:
                 model = PeftModel.from_pretrained(
                             model,
-                            f"{args.model.replace('+DPO', '')}/final_adapter",
+                            f"{args.model}/final_adapter",
                         )
                 model = model.merge_and_unload()
-                model.generation_config.top_p = None
-            if "DPO" in args.model:
-                if "nemotron" in args.model.lower():
-                    model = "models/NVIDIA-Nemotron-3-Nano-4B-BF16-SFT+DPO"
-                    base_model = model
-                else:
-                    model = PeftModel.from_pretrained(
-                                model,
-                                f"{args.model}/final_adapter",
-                            )
-                    model = model.merge_and_unload()
-                    model.generation_config.top_p = None
+            model.generation_config.top_p = None
 
-            if args.client == None and "nemotron" not in args.model.lower():
+            if args.client == None:
                 model.save_pretrained(
                     "/tmp/merged_model",
                     safe_serialization=True,
@@ -142,34 +133,34 @@ if __name__ == "__main__":
                     processor.save_pretrained(
                         "/tmp/merged_model"
                     )
-                # if "nemotron" in args.model.lower():
-                #     snapshot_download(
-                #         repo_id=args.base_model,
-                #         local_dir="/tmp/merged_model",
-                #         allow_patterns=["*.py"],
-                #     )
+                if "nemotron" in args.model.lower():
+                    snapshot_download(
+                        repo_id=args.base_model,
+                        local_dir="/tmp/merged_model",
+                        allow_patterns=["*.py"],
+                    )
 
-                #     config_path = "/tmp/merged_model/config.json"
-                #     if os.path.exists(config_path):
-                #         with open(config_path, "r") as f:
-                #             config_data = json.load(f)
-                #         if "layers_block_type" in config_data:
-                #             del config_data["layers_block_type"]
-                #             with open(config_path, "w") as f:
-                #                 json.dump(config_data, f, indent=2)
-                #         model = "/tmp/merged_model"
+                    config_path = "/tmp/merged_model/config.json"
+                    if os.path.exists(config_path):
+                        with open(config_path, "r") as f:
+                            config_data = json.load(f)
+                        if "layers_block_type" in config_data:
+                            del config_data["layers_block_type"]
+                            with open(config_path, "w") as f:
+                                json.dump(config_data, f, indent=2)
+                        model = "/tmp/merged_model"
 
-                #     modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
-                #     if os.path.exists(modeling_path):
-                #         with open(modeling_path, "r") as f:
-                #             code = f.read()
-                #         if "or cache_position[-1] >=" in code:
-                #             code = code.replace(
-                #                 "or cache_position[-1] >=", 
-                #                 "or (cache_position is not None and cache_position[-1] >="
-                #             )
-                #             with open(modeling_path, "w") as f:
-                #                 f.write(code)
+                    modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
+                    if os.path.exists(modeling_path):
+                        with open(modeling_path, "r") as f:
+                            code = f.read()
+                        if "or cache_position[-1] >=" in code:
+                            code = code.replace(
+                                "or cache_position[-1] >=", 
+                                "or (cache_position is not None and cache_position[-1] >="
+                            )
+                            with open(modeling_path, "w") as f:
+                                f.write(code)
 
         else:
             model = args.model
@@ -181,7 +172,7 @@ if __name__ == "__main__":
             else:
                 llm = HFChatClient(model=model, tokenizer_path=base_model, trust_remote_code=True)
         else:
-            if "Qwen" in args.model and "SFT" in args.model:
+            if ("Qwen" in args.model or "nemotron" in args.model.lower()) and "SFT" in args.model:
                 import vllm
                 from vllm.sampling_params import SamplingParams
 
