@@ -58,7 +58,6 @@ class HFChatClient:
 
         max_new_tokens = getattr(sampling_params, "max_tokens", 8192)
         temperature = getattr(sampling_params, "temperature", 0.0)
-        top_p = getattr(sampling_params, "top_p", 1.0)
         do_sample = temperature > 0.0
 
         all_outputs = []
@@ -76,7 +75,6 @@ class HFChatClient:
             )
             if do_sample:
                 gen_kwargs["temperature"] = temperature
-                gen_kwargs["top_p"] = top_p
 
             output_ids = self.model.generate(**enc, **gen_kwargs)
 
