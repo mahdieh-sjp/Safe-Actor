@@ -1,8 +1,10 @@
 import sys
 import os
 
-# Ensure child spawned processes can find local modules in the project root
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+# Force the project root directory to be the #1 priority in sys.path
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+if sys.path[0] != PROJECT_ROOT:
+    sys.path.insert(0, PROJECT_ROOT)
 
 import argparse
 import gc
