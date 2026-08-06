@@ -137,6 +137,7 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
 
     dpo_model = trainer.model.merge_and_unload()
     if "nemotron" in model.lower():
+        dpo_model.generation_config.top_p = None
         dpo_model.save_pretrained(sft_output_dir, safe_serialization=True)
 
     # 2. Free SFT trainer state & clear VRAM cache
@@ -160,7 +161,9 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
         dpo_adapter_dir = f"{dpo_output_dir}/final_adapter"
         trainer.save_model(dpo_adapter_dir)
     else:
-        trainer.model.merge_and_unload().save_pretrained(dpo_output_dir, safe_serialization=True)
+        model = trainer.model.merge_and_unload()
+        model.generation_config.top_p = None
+        model.save_pretrained(dpo_output_dir, safe_serialization=True)
  
     print(f"Done. SFT adapter saved to {sft_adapter_dir}, DPO adapter saved to {dpo_adapter_dir}")
 
