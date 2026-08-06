@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-
+from huggingface_hub import snapshot_download
 from peft import PeftModel
 from utils.seeds import initialize_seeds
 from google import genai
@@ -122,6 +122,12 @@ if __name__ == "__main__":
                 )
                 processor.save_pretrained(
                     "/tmp/merged_model"
+                )
+            if "nemotron" in args.model.lower():
+                snapshot_download(
+                    repo_id=args.base_model,
+                    local_dir="/tmp/merged_model",
+                    allow_patterns=["*.py"],
                 )
             model = "/tmp/merged_model"
 
