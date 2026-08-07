@@ -131,10 +131,10 @@ if __name__ == "__main__":
                     "/tmp/merged_model",
                     safe_serialization=True,
                 )
-                if "gemma" in args.model:
+                if "qwen" in args.model.lower() or "gemma" in args.model.lower():
                     processor = AutoProcessor.from_pretrained(
                         args.base_model,
-                        trust_remote_code=True,
+                        #trust_remote_code=True,
                     )
                     processor.save_pretrained(
                         "/tmp/merged_model"
