@@ -31,7 +31,7 @@ def main(llm, model, client, temperature):
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
     files = sorted(files)
 
-    df_list = [pd.read_csv(f) for f in files if "empty" not in f]
+    df_list = [pd.read_csv(f) for f in files if "empty" not in f and "refused" not in f]
     merged_df = pd.concat(df_list, axis=0, ignore_index=True)
     test_df = merged_df[merged_df["split"] == "test"]
     with open('./golden-dataset/personas_desc.json', 'r') as f:
@@ -168,35 +168,35 @@ if __name__ == "__main__":
             else:
                 llm = HFChatClient(model=model, tokenizer_path=base_model, trust_remote_code=True)
         else:
-            if ("Qwen" in args.model in args.model.lower()) and "SFT" in args.model:
-                import vllm
-                from vllm.sampling_params import SamplingParams
+            # if ("Qwen" in args.model in args.model.lower()) and "SFT" in args.model:
+            #     import vllm
+            #     from vllm.sampling_params import SamplingParams
 
-                llm = vllm.LLM(
+            #     llm = vllm.LLM(
+            #         model=model,
+            #         enable_prefix_caching=True,
+            #         dtype=args.dtype,
+            #         #trust_remote_code=True,
+            #         tensor_parallel_size=args.gpus,
+            #         model_impl="transformers",
+            #         #   download_dir=os.environ["HF_MODELS"],
+            #         gpu_memory_utilization=0.95,
+            #         tokenizer=base_model
+            #     )
+            # else:
+            import vllm
+            from vllm.sampling_params import SamplingParams
+
+            llm = vllm.LLM(
                     model=model,
                     enable_prefix_caching=True,
                     dtype=args.dtype,
                     #trust_remote_code=True,
                     tensor_parallel_size=args.gpus,
-                    model_impl="transformers",
                     #   download_dir=os.environ["HF_MODELS"],
                     gpu_memory_utilization=0.95,
                     tokenizer=base_model
                 )
-            else:
-                import vllm
-                from vllm.sampling_params import SamplingParams
-
-                llm = vllm.LLM(
-                        model=model,
-                        enable_prefix_caching=True,
-                        dtype=args.dtype,
-                        #trust_remote_code=True,
-                        tensor_parallel_size=args.gpus,
-                        #   download_dir=os.environ["HF_MODELS"],
-                        gpu_memory_utilization=0.95,
-                        tokenizer=base_model
-                    )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
     main(llm, args.model, args.client, args.temperature)
