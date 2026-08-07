@@ -155,6 +155,8 @@ if __name__ == "__main__":
                 #             )
                 #             with open(modeling_path, "w") as f:
                 #                 f.write(code)
+                model = "/tmp/merged_model"
+                base_model = args.base_model
 
         else:
             model = args.model
