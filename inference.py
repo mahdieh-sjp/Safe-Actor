@@ -166,7 +166,7 @@ if __name__ == "__main__":
             else:
                 llm = HFChatClient(model=model, tokenizer_path=base_model, trust_remote_code=True)
         else:
-            if ("Qwen" in args.model or "nemotron" in args.model.lower()) and "SFT" in args.model:
+            if ("Qwen" in args.model in args.model.lower()) and "SFT" in args.model:
                 import vllm
                 from vllm.sampling_params import SamplingParams
 
