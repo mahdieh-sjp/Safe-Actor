@@ -44,7 +44,7 @@ def find_resume_checkpoint(output_dir):
     return last_checkpoint
 
 
-def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=100):
+def main(model, batch_size=16, balanced=False, grad_accumulation_steps=1, dev=False, dev_size=100):
     initialize_seeds()
 
     model_name = model.split("/")[-1]
@@ -53,7 +53,10 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
     print(f"Training model {model_name} with SFT + DPO")
     
     print("=== LOADING DATASET ===")
-    train_data = load_dataset("json", data_files="golden-dataset/train_clean.jsonl")
+    if balanced:
+        train_data = load_dataset("json", data_files="golden-dataset/train_clean_balanced.jsonl")
+    else:
+        train_data = load_dataset("json", data_files="golden-dataset/train_clean.jsonl")
 
     print("=== PREPROCESSING DATASET ===")
     sft_dataset = train_data.map(preprocess_sft, remove_columns=["persona", "query_type", "preferred_response", "rejected_response"])["train"]
@@ -74,8 +77,9 @@ def main(model, batch_size=16, grad_accumulation_steps=1, dev=False, dev_size=10
         dpo_dataset = dpo_dataset.shuffle(seed=42).select(range(dev_size))
 
     suffix = "-dev" if dev else ""
-    sft_output_dir = f"models/{model_name}-SFT{suffix}"
-    dpo_output_dir = f"models/{model_name}-SFT+DPO{suffix}"
+    balanced_suffix = "-balanced" if balanced else ""
+    sft_output_dir = f"models/{model_name}-SFT{balanced_suffix}{suffix}"
+    dpo_output_dir = f"models/{model_name}-SFT+DPO{balanced_suffix}{suffix}"
     print(sft_dataset, dpo_dataset)
 
     peft_config = LoraConfig(
@@ -169,8 +173,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("model", help="The model to be trained", type=str)
     parser.add_argument("--batch_size", help="Batch size for training", type=int, default=16)
+    parser.add_argument("--balanced", help="use the balanced data variant", action="store_true", default=False)
     parser.add_argument("--grad_accumulation_steps", help="Gradient accumulation steps for training", type=int, default=1)
     parser.add_argument("--dev", action="store_true", help="Use a small subsample of the dataset for fast dev iteration", default=False)
     parser.add_argument("--dev_size", type=int, default=100, help="Number of samples to use in dev mode")
     args = parser.parse_args()
-    main(args.model, batch_size=args.batch_size, grad_accumulation_steps=args.grad_accumulation_steps, dev=args.dev, dev_size=args.dev_size)
+    main(args.model, batch_size=args.batch_size, balanced=args.balanced, grad_accumulation_steps=args.grad_accumulation_steps, dev=args.dev, dev_size=args.dev_size)

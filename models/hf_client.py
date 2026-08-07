@@ -69,7 +69,7 @@ class HFChatClient:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 dtype=torch_dtype,
-                device_map="auto",
+                device_map={"": 0},
                 trust_remote_code=trust_remote_code,
             )
             self.model.eval()
