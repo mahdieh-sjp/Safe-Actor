@@ -14,7 +14,7 @@ from peft import PeftModel
 from utils.seeds import initialize_seeds
 from models.openai_client import OpenAIBatchClient
 from models.hf_client import HFChatClient
-from transformers import AutoModelForCausalLM, AutoProcessor
+from transformers import AutoModelForCausalLM, AutoProcessor, Qwen3_5ForConditionalGeneration
 import json
 import glob
 import pandas as pd
@@ -102,11 +102,17 @@ if __name__ == "__main__":
 
         if "SFT" in args.model:
             base_model = args.base_model
-            model  = AutoModelForCausalLM.from_pretrained(
-                args.base_model,
-                #trust_remote_code=True,
-                dtype=torch.bfloat16,
-            )
+            if "qwen" not in args.model.lower():
+                model  = AutoModelForCausalLM.from_pretrained(
+                    args.base_model,
+                    #trust_remote_code=True,
+                    dtype=torch.bfloat16,
+                )
+            else:
+                model = Qwen3_5ForConditionalGeneration.from_pretrained(
+                    args.base_model,
+                    dtype =torch.bfloat16
+                )
             model = PeftModel.from_pretrained(
                         model,
                         f"{args.model.replace('+DPO', '')}/final_adapter",
