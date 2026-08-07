@@ -104,7 +104,7 @@ if __name__ == "__main__":
             base_model = args.base_model
             model  = AutoModelForCausalLM.from_pretrained(
                 args.base_model,
-                trust_remote_code=True,
+                #trust_remote_code=True,
                 dtype=torch.bfloat16,
             )
             model = PeftModel.from_pretrained(
@@ -133,34 +133,28 @@ if __name__ == "__main__":
                     processor.save_pretrained(
                         "/tmp/merged_model"
                     )
-                if "nemotron" in args.model.lower():
-                    snapshot_download(
-                        repo_id=args.base_model,
-                        local_dir="/tmp/merged_model",
-                        allow_patterns=["*.py"],
-                    )
+                # if "nemotron" in args.model.lower():
+                #     config_path = "/tmp/merged_model/config.json"
+                #     if os.path.exists(config_path):
+                #         with open(config_path, "r") as f:
+                #             config_data = json.load(f)
+                #         if "layers_block_type" in config_data:
+                #             del config_data["layers_block_type"]
+                #             with open(config_path, "w") as f:
+                #                 json.dump(config_data, f, indent=2)
+                #         model = "/tmp/merged_model"
 
-                    config_path = "/tmp/merged_model/config.json"
-                    if os.path.exists(config_path):
-                        with open(config_path, "r") as f:
-                            config_data = json.load(f)
-                        if "layers_block_type" in config_data:
-                            del config_data["layers_block_type"]
-                            with open(config_path, "w") as f:
-                                json.dump(config_data, f, indent=2)
-                        model = "/tmp/merged_model"
-
-                    modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
-                    if os.path.exists(modeling_path):
-                        with open(modeling_path, "r") as f:
-                            code = f.read()
-                        if "or cache_position[-1] >=" in code:
-                            code = code.replace(
-                                "or cache_position[-1] >=", 
-                                "or (cache_position is not None and cache_position[-1] >="
-                            )
-                            with open(modeling_path, "w") as f:
-                                f.write(code)
+                #     modeling_path = "/tmp/merged_model/modeling_nemotron_h.py"
+                #     if os.path.exists(modeling_path):
+                #         with open(modeling_path, "r") as f:
+                #             code = f.read()
+                #         if "or cache_position[-1] >=" in code:
+                #             code = code.replace(
+                #                 "or cache_position[-1] >=", 
+                #                 "or (cache_position is not None and cache_position[-1] >="
+                #             )
+                #             with open(modeling_path, "w") as f:
+                #                 f.write(code)
 
         else:
             model = args.model
@@ -180,7 +174,7 @@ if __name__ == "__main__":
                     model=model,
                     enable_prefix_caching=True,
                     dtype=args.dtype,
-                    trust_remote_code=True,
+                    #trust_remote_code=True,
                     tensor_parallel_size=args.gpus,
                     model_impl="transformers",
                     #   download_dir=os.environ["HF_MODELS"],
@@ -195,7 +189,7 @@ if __name__ == "__main__":
                         model=model,
                         enable_prefix_caching=True,
                         dtype=args.dtype,
-                        trust_remote_code=True,
+                        #trust_remote_code=True,
                         tensor_parallel_size=args.gpus,
                         #   download_dir=os.environ["HF_MODELS"],
                         gpu_memory_utilization=0.95,
