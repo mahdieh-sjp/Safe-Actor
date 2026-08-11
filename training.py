@@ -53,8 +53,8 @@ def main(model, batch_size=16, v2=False, balanced=False, grad_accumulation_steps
     print(f"Training model {model_name} with SFT + DPO")
     
     print("=== LOADING DATASET ===")
-    balanced_suffix = "_balanced" if balanced else ""
-    v2_suffix = "_v2" if v2 else ""
+    balanced_suffix = "-balanced" if balanced else ""
+    v2_suffix = "-v2" if v2 else ""
 
     train_data = load_dataset("json", data_files=f"golden-dataset/train_clean{v2_suffix}{balanced_suffix}.jsonl")
 
