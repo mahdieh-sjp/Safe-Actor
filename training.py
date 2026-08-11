@@ -56,7 +56,7 @@ def main(model, batch_size=16, v2=False, balanced=False, grad_accumulation_steps
     balanced_suffix = "-balanced" if balanced else ""
     v2_suffix = "-v2" if v2 else ""
 
-    train_data = load_dataset("json", data_files=f"golden-dataset/train_clean{v2_suffix}{balanced_suffix}.jsonl")
+    train_data = load_dataset("json", data_files=f"golden-dataset/train_clean{v2_suffix.replace("-", "_")}{balanced_suffix.replace("-", "_")}.jsonl")
 
     print("=== PREPROCESSING DATASET ===")
     sft_dataset = train_data.map(preprocess_sft, remove_columns=["persona", "query_type", "preferred_response", "rejected_response"])["train"]
