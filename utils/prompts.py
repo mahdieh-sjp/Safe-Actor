@@ -96,3 +96,10 @@ def get_prompt(persona_name, persona_desc, prompt, response_text):
 
 def get_system_prompt(persona, persona_desc):
     return f"You are exactly this character: {persona}. {persona_desc}"
+
+def get_gsm8k_prompt(query):
+    return f"""Solve the following math problem. Think through it step by step, then give the final numerical answer on its own line at the end in this exact format:
+    
+#### <answer>
+
+Question: {query}"""

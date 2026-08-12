@@ -14,7 +14,9 @@ from peft import PeftModel
 from utils.seeds import initialize_seeds
 from models.openai_client import OpenAIBatchClient
 from models.hf_client import HFChatClient
+from utils.prompts import get_gsm8k_prompt
 from transformers import AutoModelForCausalLM, AutoProcessor, Qwen3_5ForConditionalGeneration
+from datasets import load_dataset
 import json
 import glob
 import pandas as pd
@@ -24,24 +26,36 @@ import torch
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-def main(llm, model, client, temperature):
+def main(llm, dataset, model, client, temperature):
     initialize_seeds()
     model = model.split("/")[-1]
     DATA_DIR = "./golden-dataset/data/"
     files = glob.glob(f"{DATA_DIR}*_dataset.csv")
     files = sorted(files)
 
-    df_list = [pd.read_csv(f) for f in files if "empty" not in f and "refused" not in f]
-    merged_df = pd.concat(df_list, axis=0, ignore_index=True)
-    test_df = merged_df[merged_df["split"] == "test"]
+    if dataset == "xstest":
+        df_list = [pd.read_csv(f) for f in files if "empty" not in f and "refused" not in f]
+        merged_df = pd.concat(df_list, axis=0, ignore_index=True)
+        test_df = merged_df[merged_df["split"] == "test"]
+        suffix = ""
+    elif dataset == "gsm8k":
+        dataset = load_dataset("openai/gsm8k", "main")["test"]
+        queries = [get_gsm8k_prompt(x) for x in dataset["question"]]
+        suffix = "_gsm8k"
+    elif dataset == "ifbench":
+        dataset = load_dataset("allenai/IFBench_test")["train"]
+        queries = dataset["prompt"]
+        suffix = "_ifbench"
     with open('./golden-dataset/personas_desc.json', 'r') as f:
         personas = json.load(f)
-    print(f"\nCharacterful Response Generation for {model}")
+    print(f"\nCharacterful Response Generation for {model} and {dataset}")
+
         
 
     for persona_name, persona_desc in personas.items():
+
         result_path = Path(
-            f"./generations/{model}/{persona_name.replace(' ', '_')}.json"
+            f"./generations{suffix}/{model}/{persona_name.replace(' ', '_')}.json"
         )
         if result_path.exists():
             print(
@@ -58,10 +72,12 @@ def main(llm, model, client, temperature):
                 sampling_params = SamplingParams(max_tokens=8192, temperature=temperature)
             else:
                 sampling_params = {"max_tokens": 8192, "temperature": temperature}
+            if dataset == "xstest":
+                queries = test_df[test_df['persona'] == persona_name]["prompt"]
             prompts = [[
                         {"role": "system", "content": persona_instruction},
                         {"role": "user", "content": q}]
-                        for q in test_df[test_df['persona'] == persona_name]["prompt"]
+                        for q in queries
                     ]
             print(f"Example prompt: {prompts[0]}")
             llm.chat(prompts[0], sampling_params=sampling_params,
@@ -85,6 +101,7 @@ if __name__ == "__main__":
         description="Run inference for model {model}."
     )
     parser.add_argument("model", help="The model model to be prompted.", type=str)
+    parser.add_argument("--dataset", help="The dataset to prompt.", type=str, default="xstest", choices=["xstest", "ifbench", "gsm8k"])
     parser.add_argument("--base_model", help="The base model that was adapted.", type=str, default=None)
     parser.add_argument("--gpus", help="Number of gpus", type=int, default=1)
     parser.add_argument("--client", help="If using an api", type=str, default=None, choices=["openai", "hf"])
@@ -205,7 +222,7 @@ if __name__ == "__main__":
                 )
     elif args.client == "openai":
         llm = OpenAIBatchClient(model_name=args.model)
-    main(llm, args.model, args.client, args.temperature)
+    main(llm, args.dataset, args.model, args.client, args.temperature)
 
     if "llm" in locals():
         del llm
