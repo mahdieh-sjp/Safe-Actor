@@ -1,3 +1,5 @@
 *pycache*
 batch_requests.json
 models/*/
+index_mapping_ifbench.csv
+ratings/gemini-3.1-pro-preview-ifbench_ratings_original.jsonl
