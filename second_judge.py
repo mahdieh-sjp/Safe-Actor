@@ -102,13 +102,23 @@ def done_keys(path):
 
 
 def parse(text):
-    try:
-        d = json.loads(text)
-        r, c = int(d["refusal_score"]), int(d["character_score"])
-        if r in (0, 1) and 1 <= c <= 5:
-            return r, c, True
-    except Exception:
-        pass
+    """Scores from the judge output. Handles plain JSON, and (with --no-structured) a thinking
+    block or prose around the JSON: takes the last {...} after any closing </think> tag."""
+    if text is None:
+        return None, None, False
+    body = text.rsplit("</think>", 1)[-1]
+    candidates = [body.strip()]
+    start, end = body.rfind("{"), body.rfind("}")
+    if 0 <= start < end:
+        candidates.append(body[start : end + 1])
+    for cand in candidates:
+        try:
+            d = json.loads(cand)
+            r, c = int(d["refusal_score"]), int(d["character_score"])
+            if r in (0, 1) and 1 <= c <= 5:
+                return r, c, True
+        except Exception:
+            continue
     return None, None, False
 
 
@@ -136,6 +146,8 @@ def sampling_params(args):
     from vllm import SamplingParams
 
     common = dict(temperature=0.0, max_tokens=args.max_tokens, seed=0)
+    if args.no_structured:  # e.g. thinking models: a JSON constraint from token 1 would block thinking
+        return SamplingParams(**common)
     schema = JSON_SCHEMA_REASON if args.reason_first else JSON_SCHEMA
     try:  # newer vLLM
         from vllm.sampling_params import StructuredOutputsParams
@@ -195,8 +207,8 @@ def report(out_path, items, args):
     assert (human_personas.values == items.persona.values).all(), "human labels not aligned with items"
     second = pd.read_json(out_path, lines=True).drop_duplicates("key", keep="last").set_index("key")
     second = second.reindex(items.key)
-    missing = int(second.refusal_score.isna().sum())
-    n_invalid = int((~second.valid.fillna(False).astype(bool)).sum())
+    missing = int(second.valid.isna().sum())  # keys with no line in the ratings file
+    n_invalid = int((second.valid == False).sum())  # rated, but output unparsable (e.g. truncated)  # noqa: E712
     if missing:
         print(f"[report] WARNING: {missing} items not rated yet; agreement is incomplete.")
     # Same convention as the main pipeline (evaluation.ipynb: fillna(1.0)) for unparsable outputs.
@@ -229,8 +241,10 @@ def main():
     ap.add_argument("--quantization", default=None, help="vLLM quantization, e.g. awq, gptq, fp8")
     ap.add_argument("--mistral-format", action=argparse.BooleanOptionalAction, default=None,
                     help="Load with Mistral's native tokenizer/config/weights (default: on for mistralai/ models)")
-    ap.add_argument("--text-only", action=argparse.BooleanOptionalAction, default=True,
-                    help="Disable image inputs to save memory on multimodal judges")
+    ap.add_argument("--text-only", action=argparse.BooleanOptionalAction, default=None,
+                    help="Disable image inputs to save memory (default: on for mistralai/ models, which are multimodal)")
+    ap.add_argument("--no-structured", action="store_true",
+                    help="No JSON constraint; parse the JSON from free text (needed for thinking modes)")
     ap.add_argument("--max-model-len", type=int, default=16384)
     ap.add_argument("--max-tokens", type=int, default=None,
                     help="Default 256, or 1024 with --reason-first; raise further for a model reasoning mode")
@@ -243,6 +257,8 @@ def main():
     args = ap.parse_args()
     if args.mistral_format is None:
         args.mistral_format = args.model.startswith("mistralai/")
+    if args.text_only is None:
+        args.text_only = args.model.startswith("mistralai/")
 
     if args.max_tokens is None:
         args.max_tokens = 1024 if args.reason_first else 256
