@@ -1,0 +1,30 @@
+{
+  "judge": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+  "n_invalid_outputs": 1,
+  "thresholds": {
+    "kappa_refusal": 0.8,
+    "alpha_character": 0.7
+  },
+  "second_vs_human": {
+    "kappa_refusal": 0.31677018633540377,
+    "alpha_character_ordinal": 0.35642922333493676,
+    "kappa_character_binary(1_vs_2-5)": 0.5659722222222222,
+    "exact_match_character": 0.448,
+    "n": 250
+  },
+  "gemini_vs_human": {
+    "kappa_refusal": 0.868421052631579,
+    "alpha_character_ordinal": 0.7425648211937254,
+    "kappa_character_binary(1_vs_2-5)": 0.768041237113402,
+    "exact_match_character": 0.596,
+    "n": 250
+  },
+  "second_vs_gemini": {
+    "kappa_refusal": 0.3572861800852771,
+    "alpha_character_ordinal": 0.4643049113502633,
+    "kappa_character_binary(1_vs_2-5)": 0.5253164556962026,
+    "exact_match_character": 0.576,
+    "n": 250
+  },
+  "pass": false
+}

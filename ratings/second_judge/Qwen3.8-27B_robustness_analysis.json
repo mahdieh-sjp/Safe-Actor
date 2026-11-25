@@ -1,0 +1,1102 @@
+{
+  "judge": "Qwen/Qwen3.8-27B",
+  "n_items": 9720,
+  "n_missing": 0,
+  "n_invalid_outputs": 0,
+  "all_models": {
+    "training_effects": {
+      "refusal_unsafe": {
+        "gemini": {
+          "Qwen": {
+            "delta": 0.0931,
+            "ci": [
+              0.0661,
+              0.1207
+            ]
+          },
+          "Gemma": {
+            "delta": 0.1111,
+            "ci": [
+              0.0861,
+              0.1396
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0528,
+            "ci": [
+              0.0286,
+              0.0765
+            ]
+          },
+          "pooled": {
+            "delta": 0.0856,
+            "ci": [
+              0.0711,
+              0.1013
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": 0.0806,
+            "ci": [
+              0.0462,
+              0.1134
+            ]
+          },
+          "Gemma": {
+            "delta": 0.1528,
+            "ci": [
+              0.1199,
+              0.1852
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0403,
+            "ci": [
+              0.0084,
+              0.074
+            ]
+          },
+          "pooled": {
+            "delta": 0.0912,
+            "ci": [
+              0.0721,
+              0.1103
+            ]
+          }
+        }
+      },
+      "refusal_safe": {
+        "gemini": {
+          "Qwen": {
+            "delta": -0.0556,
+            "ci": [
+              -0.0963,
+              -0.014
+            ]
+          },
+          "Gemma": {
+            "delta": 0.1978,
+            "ci": [
+              0.1588,
+              0.2346
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0611,
+            "ci": [
+              0.0174,
+              0.1018
+            ]
+          },
+          "pooled": {
+            "delta": 0.0678,
+            "ci": [
+              0.0423,
+              0.0916
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": -0.0756,
+            "ci": [
+              -0.118,
+              -0.032
+            ]
+          },
+          "Gemma": {
+            "delta": 0.17,
+            "ci": [
+              0.1323,
+              0.2077
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0167,
+            "ci": [
+              -0.0246,
+              0.0586
+            ]
+          },
+          "pooled": {
+            "delta": 0.037,
+            "ci": [
+              0.013,
+              0.0608
+            ]
+          }
+        }
+      },
+      "character_unsafe": {
+        "gemini": {
+          "Qwen": {
+            "delta": 1.2306,
+            "ci": [
+              1.1056,
+              1.3682
+            ]
+          },
+          "Gemma": {
+            "delta": 0.05,
+            "ci": [
+              0.0007,
+              0.1003
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.6139,
+            "ci": [
+              1.4856,
+              1.7443
+            ]
+          },
+          "pooled": {
+            "delta": 0.9648,
+            "ci": [
+              0.9029,
+              1.0313
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": 1.0167,
+            "ci": [
+              0.906,
+              1.1426
+            ]
+          },
+          "Gemma": {
+            "delta": 0.0653,
+            "ci": [
+              0.0302,
+              0.1043
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.3806,
+            "ci": [
+              1.2525,
+              1.5103
+            ]
+          },
+          "pooled": {
+            "delta": 0.8208,
+            "ci": [
+              0.7642,
+              0.8844
+            ]
+          }
+        }
+      },
+      "character_safe": {
+        "gemini": {
+          "Qwen": {
+            "delta": 0.4289,
+            "ci": [
+              0.3528,
+              0.5117
+            ]
+          },
+          "Gemma": {
+            "delta": -0.0378,
+            "ci": [
+              -0.0592,
+              -0.017
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.75,
+            "ci": [
+              0.645,
+              0.8546
+            ]
+          },
+          "pooled": {
+            "delta": 0.3804,
+            "ci": [
+              0.335,
+              0.428
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": 0.2711,
+            "ci": [
+              0.2047,
+              0.3413
+            ]
+          },
+          "Gemma": {
+            "delta": -0.0267,
+            "ci": [
+              -0.0438,
+              -0.0097
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.5578,
+            "ci": [
+              0.468,
+              0.6494
+            ]
+          },
+          "pooled": {
+            "delta": 0.2674,
+            "ci": [
+              0.2308,
+              0.3071
+            ]
+          }
+        }
+      },
+      "character_refused": {
+        "gemini": {
+          "Qwen": {
+            "delta": 1.3083,
+            "ci": [
+              1.2024,
+              1.4274
+            ]
+          },
+          "Gemma": {
+            "delta": 0.0415,
+            "ci": [
+              -0.0048,
+              0.0903
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.6956,
+            "ci": [
+              1.5751,
+              1.81
+            ]
+          },
+          "pooled": {
+            "delta": 1.0152,
+            "ci": [
+              0.9583,
+              1.0735
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": 1.0617,
+            "ci": [
+              0.9589,
+              1.1724
+            ]
+          },
+          "Gemma": {
+            "delta": 0.0575,
+            "ci": [
+              0.0197,
+              0.1005
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.5009,
+            "ci": [
+              1.3856,
+              1.6158
+            ]
+          },
+          "pooled": {
+            "delta": 0.8734,
+            "ci": [
+              0.8193,
+              0.9303
+            ]
+          }
+        }
+      },
+      "character_complied": {
+        "gemini": {
+          "Qwen": {
+            "delta": 0.0789,
+            "ci": [
+              0.0252,
+              0.1333
+            ]
+          },
+          "Gemma": {
+            "delta": -0.0224,
+            "ci": [
+              -0.0414,
+              -0.0064
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.4346,
+            "ci": [
+              0.3341,
+              0.5368
+            ]
+          },
+          "pooled": {
+            "delta": 0.1637,
+            "ci": [
+              0.1262,
+              0.2025
+            ]
+          }
+        },
+        "second": {
+          "Qwen": {
+            "delta": 0.0284,
+            "ci": [
+              -0.0057,
+              0.0658
+            ]
+          },
+          "Gemma": {
+            "delta": -0.0186,
+            "ci": [
+              -0.0314,
+              -0.0075
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.2437,
+            "ci": [
+              0.175,
+              0.3123
+            ]
+          },
+          "pooled": {
+            "delta": 0.0845,
+            "ci": [
+              0.0583,
+              0.1114
+            ]
+          }
+        }
+      }
+    },
+    "findings_checks": [
+      {
+        "metric": "refusal_unsafe",
+        "unit": "Qwen",
+        "gemini": 0.0931,
+        "second": 0.0806,
+        "holds": true
+      },
+      {
+        "metric": "refusal_unsafe",
+        "unit": "Gemma",
+        "gemini": 0.1111,
+        "second": 0.1528,
+        "holds": true
+      },
+      {
+        "metric": "refusal_unsafe",
+        "unit": "Nemotron",
+        "gemini": 0.0528,
+        "second": 0.0403,
+        "holds": true
+      },
+      {
+        "metric": "refusal_unsafe",
+        "unit": "pooled",
+        "gemini": 0.0856,
+        "second": 0.0912,
+        "holds": true
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "Qwen",
+        "gemini": -0.0556,
+        "second": -0.0756,
+        "holds": true
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "Gemma",
+        "gemini": 0.1978,
+        "second": 0.17,
+        "holds": true
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "Nemotron",
+        "gemini": 0.0611,
+        "second": 0.0167,
+        "holds": false
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "pooled",
+        "gemini": 0.0678,
+        "second": 0.037,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "Qwen",
+        "gemini": 1.2306,
+        "second": 1.0167,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "Gemma",
+        "gemini": 0.05,
+        "second": 0.0653,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "Nemotron",
+        "gemini": 1.6139,
+        "second": 1.3806,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "pooled",
+        "gemini": 0.9648,
+        "second": 0.8208,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "Qwen",
+        "gemini": 0.4289,
+        "second": 0.2711,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "Gemma",
+        "gemini": -0.0378,
+        "second": -0.0267,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "Nemotron",
+        "gemini": 0.75,
+        "second": 0.5578,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "pooled",
+        "gemini": 0.3804,
+        "second": 0.2674,
+        "holds": true
+      },
+      {
+        "metric": "character_refused",
+        "unit": "Qwen",
+        "gemini": 1.3083,
+        "second": 1.0617,
+        "holds": true
+      },
+      {
+        "metric": "character_refused",
+        "unit": "Nemotron",
+        "gemini": 1.6956,
+        "second": 1.5009,
+        "holds": true
+      },
+      {
+        "metric": "character_refused",
+        "unit": "pooled",
+        "gemini": 1.0152,
+        "second": 0.8734,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "Qwen",
+        "gemini": 0.0789,
+        "second": 0.0284,
+        "holds": false
+      },
+      {
+        "metric": "character_complied",
+        "unit": "Gemma",
+        "gemini": -0.0224,
+        "second": -0.0186,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "Nemotron",
+        "gemini": 0.4346,
+        "second": 0.2437,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "pooled",
+        "gemini": 0.1637,
+        "second": 0.0845,
+        "holds": true
+      }
+    ],
+    "findings_hold": false,
+    "self_preference_descriptive": {
+      "character": {
+        "Qwen": {
+          "differential": 0.1827,
+          "ci": [
+            0.1438,
+            0.2222
+          ]
+        },
+        "Gemma": {
+          "differential": -0.013,
+          "ci": [
+            -0.0309,
+            0.0037
+          ]
+        },
+        "Nemotron": {
+          "differential": 0.2105,
+          "ci": [
+            0.1623,
+            0.2586
+          ]
+        },
+        "pooled": {
+          "differential": 0.1267,
+          "ci": [
+            0.1049,
+            0.1488
+          ]
+        }
+      },
+      "refusal": {
+        "Qwen": {
+          "differential": 0.0167,
+          "ci": [
+            -0.0037,
+            0.0358
+          ]
+        },
+        "Gemma": {
+          "differential": -0.0031,
+          "ci": [
+            -0.0228,
+            0.0167
+          ]
+        },
+        "Nemotron": {
+          "differential": 0.0302,
+          "ci": [
+            0.0111,
+            0.05
+          ]
+        },
+        "pooled": {
+          "differential": 0.0146,
+          "ci": [
+            0.0035,
+            0.0265
+          ]
+        }
+      }
+    },
+    "judge_agreement_by_condition_descriptive": {
+      "base": {
+        "kappa_refusal": 0.81127333774228,
+        "alpha_character_ordinal": 0.8197679917453865,
+        "kappa_character_binary(1_vs_2-5)": 0.9453306036131297,
+        "exact_match_character": 0.8479423868312758,
+        "n": 4860
+      },
+      "trained": {
+        "kappa_refusal": 0.8425032467884135,
+        "alpha_character_ordinal": 0.32140909873928847,
+        "kappa_character_binary(1_vs_2-5)": 0.799901185770751,
+        "exact_match_character": 0.9034979423868312,
+        "n": 4860
+      }
+    }
+  },
+  "without_qwen": {
+    "training_effects": {
+      "refusal_unsafe": {
+        "gemini": {
+          "Gemma": {
+            "delta": 0.1111,
+            "ci": [
+              0.0852,
+              0.1394
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0528,
+            "ci": [
+              0.0276,
+              0.0771
+            ]
+          },
+          "pooled": {
+            "delta": 0.0819,
+            "ci": [
+              0.0637,
+              0.1009
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": 0.1528,
+            "ci": [
+              0.1197,
+              0.1876
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0403,
+            "ci": [
+              0.0082,
+              0.0716
+            ]
+          },
+          "pooled": {
+            "delta": 0.0965,
+            "ci": [
+              0.0733,
+              0.1205
+            ]
+          }
+        }
+      },
+      "refusal_safe": {
+        "gemini": {
+          "Gemma": {
+            "delta": 0.1978,
+            "ci": [
+              0.1593,
+              0.2333
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0611,
+            "ci": [
+              0.019,
+              0.103
+            ]
+          },
+          "pooled": {
+            "delta": 0.1294,
+            "ci": [
+              0.1014,
+              0.1556
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": 0.17,
+            "ci": [
+              0.1339,
+              0.2066
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.0167,
+            "ci": [
+              -0.0249,
+              0.0603
+            ]
+          },
+          "pooled": {
+            "delta": 0.0933,
+            "ci": [
+              0.0654,
+              0.1206
+            ]
+          }
+        }
+      },
+      "character_unsafe": {
+        "gemini": {
+          "Gemma": {
+            "delta": 0.05,
+            "ci": [
+              0.0035,
+              0.1021
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.6139,
+            "ci": [
+              1.4818,
+              1.74
+            ]
+          },
+          "pooled": {
+            "delta": 0.8319,
+            "ci": [
+              0.7621,
+              0.9015
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": 0.0653,
+            "ci": [
+              0.0318,
+              0.1053
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.3806,
+            "ci": [
+              1.2518,
+              1.5098
+            ]
+          },
+          "pooled": {
+            "delta": 0.7229,
+            "ci": [
+              0.655,
+              0.7912
+            ]
+          }
+        }
+      },
+      "character_safe": {
+        "gemini": {
+          "Gemma": {
+            "delta": -0.0378,
+            "ci": [
+              -0.0591,
+              -0.0171
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.75,
+            "ci": [
+              0.6425,
+              0.8536
+            ]
+          },
+          "pooled": {
+            "delta": 0.3561,
+            "ci": [
+              0.3022,
+              0.4087
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": -0.0267,
+            "ci": [
+              -0.0448,
+              -0.0085
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.5578,
+            "ci": [
+              0.4649,
+              0.6503
+            ]
+          },
+          "pooled": {
+            "delta": 0.2656,
+            "ci": [
+              0.2195,
+              0.3132
+            ]
+          }
+        }
+      },
+      "character_refused": {
+        "gemini": {
+          "Gemma": {
+            "delta": 0.0415,
+            "ci": [
+              -0.0032,
+              0.0899
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.6956,
+            "ci": [
+              1.5762,
+              1.8162
+            ]
+          },
+          "pooled": {
+            "delta": 0.8686,
+            "ci": [
+              0.8045,
+              0.9326
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": 0.0575,
+            "ci": [
+              0.0187,
+              0.0998
+            ]
+          },
+          "Nemotron": {
+            "delta": 1.5009,
+            "ci": [
+              1.3851,
+              1.6207
+            ]
+          },
+          "pooled": {
+            "delta": 0.7792,
+            "ci": [
+              0.7168,
+              0.8418
+            ]
+          }
+        }
+      },
+      "character_complied": {
+        "gemini": {
+          "Gemma": {
+            "delta": -0.0224,
+            "ci": [
+              -0.0399,
+              -0.0067
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.4346,
+            "ci": [
+              0.3366,
+              0.5291
+            ]
+          },
+          "pooled": {
+            "delta": 0.2061,
+            "ci": [
+              0.157,
+              0.2543
+            ]
+          }
+        },
+        "second": {
+          "Gemma": {
+            "delta": -0.0186,
+            "ci": [
+              -0.0308,
+              -0.0073
+            ]
+          },
+          "Nemotron": {
+            "delta": 0.2437,
+            "ci": [
+              0.1798,
+              0.3107
+            ]
+          },
+          "pooled": {
+            "delta": 0.1125,
+            "ci": [
+              0.08,
+              0.1469
+            ]
+          }
+        }
+      }
+    },
+    "findings_checks": [
+      {
+        "metric": "refusal_unsafe",
+        "unit": "Gemma",
+        "gemini": 0.1111,
+        "second": 0.1528,
+        "holds": true
+      },
+      {
+        "metric": "refusal_unsafe",
+        "unit": "Nemotron",
+        "gemini": 0.0528,
+        "second": 0.0403,
+        "holds": true
+      },
+      {
+        "metric": "refusal_unsafe",
+        "unit": "pooled",
+        "gemini": 0.0819,
+        "second": 0.0965,
+        "holds": true
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "Gemma",
+        "gemini": 0.1978,
+        "second": 0.17,
+        "holds": true
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "Nemotron",
+        "gemini": 0.0611,
+        "second": 0.0167,
+        "holds": false
+      },
+      {
+        "metric": "refusal_safe",
+        "unit": "pooled",
+        "gemini": 0.1294,
+        "second": 0.0933,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "Gemma",
+        "gemini": 0.05,
+        "second": 0.0653,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "Nemotron",
+        "gemini": 1.6139,
+        "second": 1.3806,
+        "holds": true
+      },
+      {
+        "metric": "character_unsafe",
+        "unit": "pooled",
+        "gemini": 0.8319,
+        "second": 0.7229,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "Gemma",
+        "gemini": -0.0378,
+        "second": -0.0267,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "Nemotron",
+        "gemini": 0.75,
+        "second": 0.5578,
+        "holds": true
+      },
+      {
+        "metric": "character_safe",
+        "unit": "pooled",
+        "gemini": 0.3561,
+        "second": 0.2656,
+        "holds": true
+      },
+      {
+        "metric": "character_refused",
+        "unit": "Nemotron",
+        "gemini": 1.6956,
+        "second": 1.5009,
+        "holds": true
+      },
+      {
+        "metric": "character_refused",
+        "unit": "pooled",
+        "gemini": 0.8686,
+        "second": 0.7792,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "Gemma",
+        "gemini": -0.0224,
+        "second": -0.0186,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "Nemotron",
+        "gemini": 0.4346,
+        "second": 0.2437,
+        "holds": true
+      },
+      {
+        "metric": "character_complied",
+        "unit": "pooled",
+        "gemini": 0.2061,
+        "second": 0.1125,
+        "holds": true
+      }
+    ],
+    "findings_hold": false,
+    "self_preference_descriptive": {
+      "character": {
+        "Gemma": {
+          "differential": -0.013,
+          "ci": [
+            -0.029,
+            0.0025
+          ]
+        },
+        "Nemotron": {
+          "differential": 0.2105,
+          "ci": [
+            0.1648,
+            0.2574
+          ]
+        },
+        "pooled": {
+          "differential": 0.0988,
+          "ci": [
+            0.0738,
+            0.1235
+          ]
+        }
+      },
+      "refusal": {
+        "Gemma": {
+          "differential": -0.0031,
+          "ci": [
+            -0.0216,
+            0.0167
+          ]
+        },
+        "Nemotron": {
+          "differential": 0.0302,
+          "ci": [
+            0.0105,
+            0.0512
+          ]
+        },
+        "pooled": {
+          "differential": 0.0136,
+          "ci": [
+            -0.0009,
+            0.0275
+          ]
+        }
+      }
+    },
+    "judge_agreement_by_condition_descriptive": {
+      "base": {
+        "kappa_refusal": 0.8241479153320013,
+        "alpha_character_ordinal": 0.8363383918623184,
+        "kappa_character_binary(1_vs_2-5)": 0.940837185631282,
+        "exact_match_character": 0.858641975308642,
+        "n": 3240
+      },
+      "trained": {
+        "kappa_refusal": 0.8374977202261535,
+        "alpha_character_ordinal": 0.344175554630078,
+        "kappa_character_binary(1_vs_2-5)": 0.7998517420311342,
+        "exact_match_character": 0.8972222222222223,
+        "n": 3240
+      }
+    }
+  }
+}
