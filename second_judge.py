@@ -131,6 +131,8 @@ def build_llm(args):
         gpu_memory_utilization=args.gpu_memory_utilization,
         tensor_parallel_size=args.gpus,
         enable_prefix_caching=True,  # the ~1.9k-token instruction + 10 demos are shared by every request
+        # vLLM's default (1024) can exceed the Mamba cache blocks of hybrid models (Qwen3.5+ on one H100: 343)
+        max_num_seqs=args.max_num_seqs,
         seed=0,
     )
     if args.quantization:
@@ -251,6 +253,8 @@ def main():
     ap.add_argument("--reason-first", action="store_true",
                     help="Let the judge write a rationale before the scores (outputs tagged '-reason')")
     ap.add_argument("--gpu-memory-utilization", type=float, default=0.92)
+    ap.add_argument("--max-num-seqs", type=int, default=256,
+                    help="Max concurrent sequences in vLLM; lower it if a hybrid (Mamba) model runs out of cache blocks")
     ap.add_argument("--chunk-size", type=int, default=32, help="Items generated between saves to disk")
     ap.add_argument("--chat-template-kwargs", default=None, help='JSON, e.g. \'{"reasoning_effort": "high"}\'')
     ap.add_argument("--agreement-only", action="store_true", help="Skip judging; recompute agreement")
