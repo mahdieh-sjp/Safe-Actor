@@ -46,6 +46,15 @@ JSON_SCHEMA = {
     "additionalProperties": False,
 }
 
+# --reason-first: the judge writes a short rationale before the scores (properties are
+# generated in schema order). Closer to Gemini 3.1 Pro, which thinks before answering.
+JSON_SCHEMA_REASON = {
+    "type": "object",
+    "properties": {"reasoning": {"type": "string"}, **JSON_SCHEMA["properties"]},
+    "required": ["reasoning", "refusal_score", "character_score"],
+    "additionalProperties": False,
+}
+
 
 # ----------------------------------------------------------------------------- data
 def load_validation_items():
@@ -127,14 +136,15 @@ def sampling_params(args):
     from vllm import SamplingParams
 
     common = dict(temperature=0.0, max_tokens=args.max_tokens, seed=0)
+    schema = JSON_SCHEMA_REASON if args.reason_first else JSON_SCHEMA
     try:  # newer vLLM
         from vllm.sampling_params import StructuredOutputsParams
 
-        return SamplingParams(structured_outputs=StructuredOutputsParams(json=JSON_SCHEMA), **common)
+        return SamplingParams(structured_outputs=StructuredOutputsParams(json=schema), **common)
     except ImportError:  # older vLLM
         from vllm.sampling_params import GuidedDecodingParams
 
-        return SamplingParams(guided_decoding=GuidedDecodingParams(json=JSON_SCHEMA), **common)
+        return SamplingParams(guided_decoding=GuidedDecodingParams(json=schema), **common)
 
 
 def judge(items, out_path, args):
@@ -222,7 +232,10 @@ def main():
     ap.add_argument("--text-only", action=argparse.BooleanOptionalAction, default=True,
                     help="Disable image inputs to save memory on multimodal judges")
     ap.add_argument("--max-model-len", type=int, default=16384)
-    ap.add_argument("--max-tokens", type=int, default=256, help="Raise when a reasoning mode is enabled")
+    ap.add_argument("--max-tokens", type=int, default=None,
+                    help="Default 256, or 1024 with --reason-first; raise further for a model reasoning mode")
+    ap.add_argument("--reason-first", action="store_true",
+                    help="Let the judge write a rationale before the scores (outputs tagged '-reason')")
     ap.add_argument("--gpu-memory-utilization", type=float, default=0.92)
     ap.add_argument("--chunk-size", type=int, default=32, help="Items generated between saves to disk")
     ap.add_argument("--chat-template-kwargs", default=None, help='JSON, e.g. \'{"reasoning_effort": "high"}\'')
@@ -231,7 +244,9 @@ def main():
     if args.mistral_format is None:
         args.mistral_format = args.model.startswith("mistralai/")
 
-    tag = args.tag or args.model.rstrip("/").split("/")[-1]
+    if args.max_tokens is None:
+        args.max_tokens = 1024 if args.reason_first else 256
+    tag = args.tag or args.model.rstrip("/").split("/")[-1] + ("-reason" if args.reason_first else "")
     out_path = OUT_DIR / f"{tag}_validate_ratings.jsonl"
     items = load_validation_items()
     if not args.agreement_only:
