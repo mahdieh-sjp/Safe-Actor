@@ -344,6 +344,28 @@ def training_effects(df, families, rng):
     return out
 
 
+def training_levels(df, families, rng):
+    """Base and trained levels per judge and metric, per family and averaged over families
+    (the pooled level is the mean of the family levels, matching how pooled deltas are computed)."""
+    out = {}
+    for judge in ("g", "q"):
+        jname = "gemini" if judge == "g" else "second"
+        for name, fn in METRICS.items():
+            for cond in ("base", "trained"):
+                vals, boots = {}, {}
+                for fam in families:
+                    g = df[(df.family == fam) & (df.condition == cond)]
+                    arr = _arrays(g, judge)
+                    vals[fam] = fn(*arr)
+                    idx = rng.integers(0, len(g), size=(N_BOOT, len(g)))
+                    boots[fam] = np.array([fn(*(a[idx[i]] for a in arr)) for i in range(N_BOOT)])
+                res = {fam: {"level": round(float(vals[fam]), 4), "ci": _ci(boots[fam])} for fam in families}
+                res["pooled"] = {"level": round(float(np.mean(list(vals.values()))), 4),
+                                 "ci": _ci(np.nanmean(np.vstack(list(boots.values())), axis=0))}
+                out.setdefault(name, {}).setdefault(jname, {})[cond] = res
+    return out
+
+
 def findings_hold(effects, units):
     checks = []
     for name, by_judge in effects.items():
@@ -407,6 +429,7 @@ def robustness_report(out_path, items, args):
         checks = findings_hold(eff, fams + ["pooled"])
         sp = self_preference(sub, fams, rng)
         summary[label] = {
+            "training_levels": training_levels(sub, fams, rng),
             "training_effects": eff,
             "findings_checks": checks,
             "findings_hold": all(c["holds"] for c in checks),
@@ -422,6 +445,13 @@ def robustness_report(out_path, items, args):
         rows = [{"metric": m, "unit": u, "gemini": f'{v["gemini"][u]["delta"]:+.3f} {v["gemini"][u]["ci"]}',
                  "second": f'{v["second"][u]["delta"]:+.3f} {v["second"][u]["ci"]}'}
                 for m, v in s["training_effects"].items() for u in ["pooled"]]
+        lv = s["training_levels"]
+        lrows = [{"metric": m,
+                  "gemini base -> trained": f'{lv[m]["gemini"]["base"]["pooled"]["level"]:.3f} -> {lv[m]["gemini"]["trained"]["pooled"]["level"]:.3f}',
+                  "second base -> trained": f'{lv[m]["second"]["base"]["pooled"]["level"]:.3f} -> {lv[m]["second"]["trained"]["pooled"]["level"]:.3f}'}
+                 for m in lv]
+        print("Levels (base -> trained), pooled over families:")
+        print(pd.DataFrame(lrows).to_string(index=False))
         print("Training effects (trained - base), pooled over families:")
         print(pd.DataFrame(rows).to_string(index=False))
         failed = [c for c in s["findings_checks"] if not c["holds"]]
@@ -481,6 +511,8 @@ def main():
     if not args.agreement_only:
         judge(items, out_path, args)
     (report if args.stage == "validate" else robustness_report)(out_path, items, args)
+    sys.stdout.flush()  # os._exit skips buffer flushing
+    sys.stderr.flush()
     os._exit(0)  # vLLM worker processes can block a normal exit
 
 
